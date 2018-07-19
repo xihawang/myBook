@@ -88,18 +88,21 @@
                 <div class="panel-body">
                     <div class="pad-btm form-inline">
                         <div class="row">
+
                             <div class="col-sm-4 table-toolbar-left">
                                 <!-- Bootstrap Select with Search Input -->
                                 <!--===================================================-->
-                                <select class="selectpicker" data-live-search="true" data-width="100%">
-                                    <option>Family</option>
-                                    <option>Friend</option>
-                                    <option>Partner</option>
-                                    <option>Sport</option>
-                                    <option>Movie</option>
-                                    <option>Documents</option>
-                                    <option>Music</option>
-                                    <option>Video</option>
+                                <form action="{% url 'index' %}" method="get">
+                                <select class="selectpicker" data-live-search="true" data-width="100%" name="type">
+                                    <option value="">类别选择(默认全部)</option>
+                                    {% for type in type_all %}
+                                        {% if is_type == type.id %}
+                                            <option value="{{ type.id }}" selected='selected'>{{ type.type_book }}
+                                            </option>
+                                        {% else %}
+                                            <option value="{{ type.id }}">{{ type.type_book }}</option>
+                                        {% endif %}
+                                    {% endfor %}
                                 </select>
                                 <!--===================================================-->
                             </div>
@@ -112,11 +115,11 @@
                                     <div class="col-sm-9">
                                         <div class="radio">
                                             <input id="demo-radio-7" class="magic-radio" type="radio" name="status"
-                                                   value="1">
+                                                   value="1" {% ifequal is_status 1 %}checked{% endifequal %}>
                                             <label for="demo-radio-7">已出版</label>
 
                                             <input id="demo-radio-8" class="magic-radio" type="radio" name="status"
-                                                   value="0">
+                                                   value="0" {% ifequal is_status 0 %}checked{% endifequal %}>
                                             <label for="demo-radio-8">未出版</label>
                                         </div>
                                     </div>
@@ -127,13 +130,18 @@
                             <div class="col-sm-6 table-toolbar-right">
                                 <div class="form-group">
                                     <input type="text" autocomplete="off" class="form-control" placeholder="Search"
-                                           id="demo-input-search2">
+                                           id="demo-input-search2" name="search"
+                                            value="{% ifequal search '' %}{% else %}{{ search }}{% endifequal %}"
+                                    >
                                 </div>
                                 <div class="btn-group">
-                                    <input class="btn btn-default" type="submit" value="搜索">
+                                    <input class="btn btn-default" type="submit"
+                                           value="搜索">
                                 </div>
                             </div>
                         </div>
+                        </form>
+
                     </div>
                     <div class="table-responsive">
                         <table class="table table-striped">
@@ -178,27 +186,40 @@
                     <hr>
                     <div class="pull-right">
                         <ul class="pagination text-nowrap mar-no">
-                            <li class="page-pre disabled">
-                                <a href="#">&lt;</a>
-                            </li>
-                            <li class="page-number active">
-                                <span>1</span>
-                            </li>
-                            <li class="page-number">
-                                <a href="#">2</a>
-                            </li>
-                            <li class="page-number">
-                                <a href="#">3</a>
-                            </li>
-                            <li>
-                                <span>...</span>
-                            </li>
-                            <li class="page-number">
-                                <a href="#">9</a>
-                            </li>
-                            <li class="page-next">
-                                <a href="#">&gt;</a>
-                            </li>
+{#                          判断是否有上一页，如果有就显示，如果没有就不显示或者不让点#}
+                            {% if book_obj.has_previous %}
+                                <li class="page-pre">
+                                    <a href="?page={{ book_obj.previous_page_number }}">&lt;</a>
+                                </li>
+                            {% else %}
+                                <li class="page-pre disabled">
+                                    <a href="#">&lt;</a>
+                                </li>
+                            {% endif %}
+
+{#                            生成分页#}
+                            {% for page in book_obj.paginator.page_range %}
+                                {% if book_obj.number == page %}
+                                    <li class="page-number active">
+                                        <a href="?page={{ page }}">{{ page }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-number">
+                                        <a href="?page={{ page }}">{{ page }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+{#                            判断是否有下一页，如果有就显示，如果没有就不显示或者不让点#}
+                            {% if book_obj.has_next %}
+                                <li class="page-next">
+                                    <a href="?page={{ book_obj.next_page_number }}">&gt;</a>
+                                </li>
+                            {% else %}
+                                <li class="page-next disabled">
+                                    <a href="#">&gt;</a>
+                                </li>
+                            {% endif %}
                         </ul>
                     </div>
                 </div>
@@ -206,3 +227,5 @@
         </div>
     </div>>
 {% endblock %}
+
+

@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r',^test/',test),
     url(r'^$',index.as_view()),
-    url(r',^index/$',index.as_view(),name='index'),
+    url(r'^index/$',index.as_view(),name='index'),
 
 ]
+
